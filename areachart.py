@@ -6,8 +6,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 def calculate_euclidean_distance(point1, point2):
-    #abdessamed 
-    #kenza
+    
     
     # Calculate the square of the differences in coordinates
     delta_x = point1[0] - point2[0]
