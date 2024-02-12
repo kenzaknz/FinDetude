@@ -68,18 +68,41 @@ def bubble_sort_descending(T1, T2):
             if T1[j] < T1[j + 1]:
                 T1[j], T1[j + 1] = T1[j + 1], T1[j]
                 T2[j], T2[j + 1] = T2[j + 1], T2[j]
+def calculate_absolute_distance(point1, point2):
+    delta_x = point1[0] - point2[0]
+    delta_y = point1[1] - point2[1]
+
+    # Calculate the absolute difference for each coordinate
+    absolute_distance_x = abs(delta_x)
+    absolute_distance_y = abs(delta_y)
+
+    return (absolute_distance_x, absolute_distance_y)
 def flight_ri(flight,ri):
     result = []
    
-    for elem in flight:
-         result.append(elem * ri)
+    for i in range(len(flight)):
+        
+        result.append((flight[i][0]* ri, flight[i][ 1] * ri))
     return result                  
-def porsuite_equation(old,result):
+def porsuite_equation(old,result,suivi):
     new = []
     for i in range(len(old)):
-       sum = (old[i][0] + result[i], old[i][1] + result[i])
+       if old[i][0]<suivi[i][0] and old[i][1]<suivi[i][1]:
+          sum = (old[i][0] + result[i][0], old[i][1] + result[i][1])
+       elif old[i][0]>suivi[i][0] and old[i][1]>suivi[i][1]  :
+          sum = (old[i][0] - result[i][0], old[i][1] - result[i][1]) 
+       elif old[i][0]<suivi[i][0] and old[i][1]>suivi[i][1]  :
+          sum = (old[i][0] + result[i][0], old[i][1] - result[i][1]) 
+       elif old[i][0]>suivi[i][0] and old[i][1]<suivi[i][1]  :
+          sum = (old[i][0] - result[i][0], old[i][1] + result[i][1]) 
+       elif old[i][0]==suivi[i][0] and old[i][1]>suivi[i][1]  :
+          sum = (old[i][0] + result[i][0], old[i][1] - result[i][1])  
+       elif old[i][0]>suivi[i][0] and old[i][1]==suivi[i][1]  :
+          sum = (old[i][0] - result[i][0], old[i][1] + result[i][1])        
+       else : 
+          sum = (old[i][0] + result[i][0], old[i][1] + result[i][1])               
        new.append(sum)
-    return new                  
+    return new              
 class MyMainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -172,7 +195,7 @@ class MyMainWindow(QMainWindow):
         pourcentage=0.3
         cutt=round(pourcentage*len(all_sensor_positions))
         all_new=[]
-        all_random_nbr=[]
+        all_suivi=[]
         all_ri=[]
         all_old=[]
         new_coverages=[]
@@ -180,26 +203,26 @@ class MyMainWindow(QMainWindow):
 # porsuite et les nouveaux couvertures
         for i in range(cutt, len(all_sensor_positions)):
                    distancee=[]
-                   old=[]
-                   
                    random_nbr=random.randint(0,cutt-1)
                    ri=random.uniform(0,1)
                    
                    for j in range(num_sensors):
-                   
-                       distance = calculate_euclidean_distance(all_sensor_positions[i][j],all_sensor_positions[random_nbr][j] )
+                       old =all_sensor_positions[i]
+                       suivi=all_sensor_positions[random_nbr]
+                       distance = calculate_absolute_distance(old[j],suivi[j] )
                        distancee.append(distance)
-                       old=all_sensor_positions[i]
+                       
                        
                        
 
                    all_ri.append(ri)
-                   all_random_nbr.append(random_nbr)
-                   new_sensors=porsuite_equation(old,flight_ri(distancee,ri)) 
+                   all_suivi.append(suivi)
+                   all_old.append(old)
+                   new_sensors=porsuite_equation(old,flight_ri(distancee,ri),suivi) 
                    cvrgs=probability_multiplesensors_multipoints(M, N,new_sensors , sensing_range)  
                    new_coverages.append(cvrgs)
                    all_distances.append(distancee)
-                   all_old.append(old)
+                   
                    all_new.append(new_sensors)
         
                    
@@ -209,7 +232,7 @@ class MyMainWindow(QMainWindow):
         print("the seven vectors of distance") 
         print(all_distances)    
         print("_______________________________________________________")  
-        print("random number",all_random_nbr)
+        print("capteurs suivis ",suivi)
         print("_________________________________________________________")  
         print("old",all_old)
         print("_______________________________________________________")  
