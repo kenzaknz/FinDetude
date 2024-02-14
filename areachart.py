@@ -204,7 +204,7 @@ class MyMainWindow(QMainWindow):
         for i in range(cutt, len(all_sensor_positions)):
                    distancee=[]
                    random_nbr=random.randint(0,cutt-1)
-                   ri=random.uniform(0,1)
+                   ri=random.uniform(0.9,1.1)
                    
                    for j in range(num_sensors):
                        old =all_sensor_positions[i]
@@ -213,10 +213,8 @@ class MyMainWindow(QMainWindow):
                        distancee.append(distance)
                        
                        
-                       
-
                    all_ri.append(ri)
-                   all_suivi.append(suivi)
+                   all_suivi.append(all_suivi)
                    all_old.append(old)
                    new_sensors=porsuite_equation(old,flight_ri(distancee,ri),suivi) 
                    cvrgs=probability_multiplesensors_multipoints(M, N,new_sensors , sensing_range)  
