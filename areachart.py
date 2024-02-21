@@ -19,6 +19,12 @@ def calculate_euclidean_distance(point1, point2):
     distance = distance_squared**0.5
 
     return distance
+
+def select_solution_not_in_tabuu(bestsol,tabu_list):
+    if bestsol not in tabu_list:
+        return bestsol
+    return None
+
 def probability_singlepoint_singlesensor(point_coordinates, sensor_coordinates, sensor_range):
     
     
@@ -184,8 +190,8 @@ class MyMainWindow(QMainWindow):
         print("Sorted Sensor Positions with Coverage:")
         #for sensor_positions, coverage in sorted_sensor_positions_with_coverage:
          #print(f"Sensor Positions - {sensor_positions} : Coverage - {coverage}")
-        print(all_sensor_positions)
-        print(all_coverage_rates)
+        #print(all_sensor_positions)
+        #print(all_coverage_rates)
 
         print("----------------------------------------------")
         print("----------------------------------------------")
@@ -204,7 +210,7 @@ class MyMainWindow(QMainWindow):
         for i in range(cutt, len(all_sensor_positions)):
                    distancee=[]
                    random_nbr=random.randint(0,cutt-1)
-                   ri=random.uniform(0.9,1.1)
+                   ri=random.uniform(0.9,1)
                    
                    for j in range(num_sensors):
                        old =all_sensor_positions[i]
@@ -226,21 +232,144 @@ class MyMainWindow(QMainWindow):
                    
                    
                   
+        all_coverages = new_coverages +all_coverage_rates
+        all_positions= all_new + all_sensor_positions
+        bubble_sort_descending(all_coverages, all_positions)
+        print("________________________________________________________") 
+        #print("all coverage")    
+        #print(all_coverages)
+        print("________________________________________________________")  
+        #print("all positions")    
+        #print(all_positions)
+        print("________________________________________________________")  
+        print("best 10 solutions")   
+        the_best_10_solution1=[]
+        the_best_10_couverages1=[]
+         
+        for i in range (10):
+               the_best_10_solution1.append(all_positions[i])
+               the_best_10_couverages1.append(all_coverages[i])
+        print(the_best_10_couverages1)
+        print(the_best_10_solution1)  
+        
+        
+        nbr_voisin=15#10
+        iterations=30
+        #20
+        the10Voisins=[]
+        the10Covvoisin=[]
+        #len(the_best_10_solution1)
+        bes_sol_after_20iter=[]
+        best_cov_after20iter=[]
+        tabu_list=[]
+        tabu_list_max_size=10
+        
+        for i in range(len(the_best_10_solution1)):#10
+            bestsol=the_best_10_solution1[i]
+            bestCov=the_best_10_couverages1[i]
+            #the liste li fiha the best coverages in every iteration(20)
+            best_sol_every_iteration=[]
+            best_cov_every_iteration=[]
+            
+            
+            for w in range(iterations):#20
+              
+                the10Voisins=[]
+                the10Covvoisin=[]
+                randomxx=[]
+                randomyy=[]
+                
+            
+                for x in range(nbr_voisin):#10
+                    randomX=sensing_range*(random.uniform(-0.5,0.5))
+                    randomY=sensing_range*(random.uniform(-0.5,0.5))
+                    voisin=[]
+                    
+                    for j in range(len(bestsol)):#70
+                         randomX=sensing_range*(random.uniform(-0.5,0.5))
+                         randomY=sensing_range*(random.uniform(-0.5,0.5))
+                         voisin.append((bestsol[j][0]+randomX,bestsol[j][1]+randomY))
+                    #randomxx.append(randomX)  
+                    #randomyy.append(randomY)  
+                    the10Voisins.append(voisin)
+                    CovVoisin=probability_multiplesensors_multipoints(M, N,voisin , sensing_range) 
+                    the10Covvoisin.append(CovVoisin)
+                    
+                    
 
-        print("the seven vectors of distance") 
-        print(all_distances)    
+
+                bubble_sort_descending(the10Covvoisin, the10Voisins)
+                bestsol=the10Voisins[0]
+                bestCov=the10Covvoisin[0]
+                #print("voisins ",the10Voisins)
+                #print("cov ",the10Covvoisin)
+
+                bestsolution=select_solution_not_in_tabuu(bestsol,tabu_list)
+
+                if bestsolution is None:
+                    bestsol=the10Voisins[1]
+                    bestCov=the10Covvoisin[1]
+                    best_sol_every_iteration.append(bestsol)
+                    best_cov_every_iteration.append(bestCov)
+                    tabu_list.append(bestsol)
+                    if len(tabu_list) > tabu_list_max_size:
+                         tabu_list.pop(0)
+                    
+                    
+                    
+                else:
+                    tabu_list.append(bestsol)
+                    best_sol_every_iteration.append(bestsol)
+                    best_cov_every_iteration.append(bestCov)
+                    if len(tabu_list) > tabu_list_max_size:
+                         tabu_list.pop(0)
+
+
+
+
+                #best_sol_every_iteration.append(bestsol)
+                #best_cov_every_iteration.append(bestCov)
+                #print("************************************")
+                #print("i ",i)
+                #print("w ",w)
+                #print("randomx ",randomxx)
+                #print("randomy ",randomyy)
+                
+                # Select the best solution not in the Tabu list
+                
+            #print('tabu_list')
+            #print(tabu_list)
+
+
+            bubble_sort_descending(best_cov_every_iteration, best_sol_every_iteration)  
+            bes_sol_after_20iter.append(best_sol_every_iteration[0])
+            best_cov_after20iter.append(best_cov_every_iteration[0])
+        print("*********************")
+        print("bes_sol_after_20iter",bes_sol_after_20iter)
+        print("best_cov_after20iter",best_cov_after20iter)
+        bubble_sort_descending(best_cov_after20iter,bes_sol_after_20iter)
+
+        
+
+
+
+
+        #print("the seven vectors of distance") 
+        #print(all_distances)    
         print("_______________________________________________________")  
-        print("capteurs suivis ",suivi)
+        #print("capteurs suivis ",suivi)
         print("_________________________________________________________")  
-        print("old",all_old)
+        #print("old",all_old)
         print("_______________________________________________________")  
-        print(" ri",all_ri)
+        #print(" ri",all_ri)
         print("____________________________________________________________")  
-        print("new sensor")    
-        print(all_new)
+        #print("new sensor")    
+        #print(all_new)
         print("____________________________________________________________")  
-        print("new coverages")    
-        print(new_coverages)
+        #print("new coverages")    
+        #print(new_coverages)
+
+        
 
         #sorted_coverage_rates = sorted(all_coverage_rates)
         #print(sorted_coverage_rates)
@@ -262,11 +391,15 @@ class MyMainWindow(QMainWindow):
         #print("Sorted Coverage Rates:",sorted(all_coverage_rates, reverse=True))
         print("----------------------------------------------")
         print("----------------------------------------------")
-        print("Best Sensor positions:",best_sensor_positions )
-        print("The best Coverage:",probability_multiplesensors_multipoints(M, N,best_sensor_positions, sensing_range) )
+        #print("Best Sensor positions:",best_sensor_positions )
+        #print("The best Coverage:",probability_multiplesensors_multipoints(M, N,best_sensor_positions, sensing_range) )
+        print("Best Sensor positions:",bes_sol_after_20iter[0])
+        print("The best Coverage:",probability_multiplesensors_multipoints(M, N,bes_sol_after_20iter[0], sensing_range) )
          
         
-        for x, y in new_sensors:
+        #for x, y in new_sensors:
+        #for x, y in the_best_10_solution1[0]:
+        for x, y in  bes_sol_after_20iter [0]: 
         #for x, y in best_sensor_positions:       
             # Add sensors
                ax.scatter(x, y, s=sensor_size, c=sensor_color, alpha=0.8, edgecolors='black')
