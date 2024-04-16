@@ -74,6 +74,22 @@ def bubble_sort_descending(T1, T2):
             if T1[j] < T1[j + 1]:
                 T1[j], T1[j + 1] = T1[j + 1], T1[j]
                 T2[j], T2[j + 1] = T2[j + 1], T2[j]
+def bubble_sort_descending_four(T1, T2, T3, T4):
+    n = len(T1)
+
+    # Traverse through all elements in T1
+    for i in range(n - 1):
+        # Last i elements are already sorted, so we don't need to check them
+        for j in range(0, n - i - 1):
+            # Swap if the element found is smaller than the next element in T1
+            if T1[j] < T1[j + 1]:
+                T1[j], T1[j + 1] = T1[j + 1], T1[j]
+                T2[j], T2[j + 1] = T2[j + 1], T2[j]
+                T3[j], T3[j + 1] = T3[j + 1], T3[j]
+                T4[j], T4[j + 1] = T4[j + 1], T4[j]
+
+
+
 def calculate_absolute_distance(point1, point2):
     delta_x = point1[0] - point2[0]
     delta_y = point1[1] - point2[1]
@@ -89,26 +105,75 @@ def flight_ri(flight,ri):
     for i in range(len(flight)):
         
         result.append((flight[i][0]* ri, flight[i][ 1] * ri))
-    return result                  
+    return result   
+def matrix_multiply(t1, t2):
+    result = []
+
+    for i in range(len(t1)):
+        row = []
+        for j in range(len(t2[0])):
+            value = 0
+            for k in range(len(t1[0])):
+                value += t1[i][k] * t2[k][j]
+            row.append(value)
+        result.append(tuple(row))
+
+    return result               
+
 def porsuite_equation(old,result,suivi):
     new = []
     for i in range(len(old)):
-       if old[i][0]<suivi[i][0] and old[i][1]<suivi[i][1]:
+       
           sum = (old[i][0] + result[i][0], old[i][1] + result[i][1])
-       elif old[i][0]>suivi[i][0] and old[i][1]>suivi[i][1]  :
-          sum = (old[i][0] - result[i][0], old[i][1] - result[i][1]) 
-       elif old[i][0]<suivi[i][0] and old[i][1]>suivi[i][1]  :
-          sum = (old[i][0] + result[i][0], old[i][1] - result[i][1]) 
-       elif old[i][0]>suivi[i][0] and old[i][1]<suivi[i][1]  :
-          sum = (old[i][0] - result[i][0], old[i][1] + result[i][1]) 
-       elif old[i][0]==suivi[i][0] and old[i][1]>suivi[i][1]  :
-          sum = (old[i][0] + result[i][0], old[i][1] - result[i][1])  
-       elif old[i][0]>suivi[i][0] and old[i][1]==suivi[i][1]  :
-          sum = (old[i][0] - result[i][0], old[i][1] + result[i][1])        
-       else : 
-          sum = (old[i][0] + result[i][0], old[i][1] + result[i][1])               
-       new.append(sum)
-    return new              
+                     
+          new.append(sum)
+    return new      
+def porsuite_equation_random(old,randomx,randomy,rangee):
+    new = []
+    for i in range(len(old)):
+       
+          sum = (old[i][0] + randomx*rangee, old[i][1] + randomy*rangee)
+          #sum = (old[i][0] + randomx*rangee ,old[i][1]  + randomy*rangee)
+                     
+          new.append(sum)
+    return new                   
+def comparison(list1, list2,sollist1,sollist2,cutt):
+    nbr=len(list1)-cutt
+    last_seven_list1 = list1[-(nbr):]
+    last_seven_sol1=sollist1[-(nbr):]
+    new__m_cvrgs = []
+    new__m_sol=[]
+    for i in range(nbr):
+        if last_seven_list1[i] > list2[i]:
+            new__m_cvrgs.append(last_seven_list1[i])
+            new__m_sol.append(last_seven_sol1[i])
+        else:
+            new__m_cvrgs.append(list2[i])
+            new__m_sol.append(sollist2[i])
+    new_m_cvrgs = list1[:cutt] + new__m_cvrgs
+    new_m_sol = sollist1[:cutt] + new__m_sol
+
+    return new_m_cvrgs,new_m_sol
+
+
+def comparison_sol(list1, list2,best_sol_every_iteration,all_new,cutt):
+    nbr=len(list1)-cutt
+    last_seven_list1 = list1[-(nbr):]
+    new__m_cvrgs = []
+    new__m_sol=[]
+    for i in range(nbr):
+        if last_seven_list1[i] > list2[i]:
+            new__m_cvrgs.append(last_seven_list1[i])
+            new__m_sol.append(best_sol_every_iteration[i])
+        else:
+            new__m_cvrgs.append(list2[i])
+            new__m_sol.append(all_new[i])
+    new_m_cvrgs = list1[:cutt] + new__m_cvrgs
+    new_m_sol = list1[:cutt] + new__m_sol
+
+    return new_m_sol
+
+                 
 class MyMainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -163,97 +228,35 @@ class MyMainWindow(QMainWindow):
         num_itr=10
         M=150
         N=85
+        M0=0
+        N0=0
+        Mm0=[M0,M/2,M0,M/2]
+        Nn0=[N0,N0,N/2,N/2]
+        Mm=[M/2,M,M/2,M]
+        Nn=[N/2,N/2,N,N]
+        num_sensors = 80
+        num_sensorss=[num_sensors/4,num_sensors/4,num_sensors/4,num_sensors/4]
         sensing_range=9
         for iteration in range(num_itr):
             # Randomly generate the positions of sensors
-            num_sensors = 80
-            sensor_positions = [(random.uniform(1+sensing_range, M-sensing_range), random.uniform(1+sensing_range, N-sensing_range)) for _ in range(num_sensors)]
+            
+            sensor_positions = [(random.uniform(1+M0+sensing_range, M-sensing_range), random.uniform(1+N0+sensing_range, N-sensing_range)) for _ in range(num_sensors)]
             
             coverages=probability_multiplesensors_multipoints(M, N,sensor_positions , sensing_range)  
             all_coverage_rates.append(coverages)
             all_sensor_positions.append(sensor_positions)
             bubble_sort_descending(all_coverage_rates, all_sensor_positions)
-            # Display the coordinates without plotting
-            #print(f"Iteration {iteration + 1}: Sensor Positions - {sensor_positions} : coverage - {coverages}")
-             # Update the list of sensor positions with their coverage
+            
             sensor_positions_with_coverage.append((sensor_positions, coverages))
             
             if coverages > maxCov :
               maxCov = coverages
-              best_sensor_positions = sensor_positions
-        # Sort the list of sensor positions with their coverage by coverage in descending order
-        sorted_sensor_positions_with_coverage = sorted(sensor_positions_with_coverage, key=lambda x: x[1], reverse=True)
-        
-        print("----------------------------------------------")
-        print("----------------------------------------------")
-        # Print the sorted sensor positions with their coverage
-        print("Sorted Sensor Positions with Coverage:")
-        #for sensor_positions, coverage in sorted_sensor_positions_with_coverage:
-         #print(f"Sensor Positions - {sensor_positions} : Coverage - {coverage}")
-        #print(all_sensor_positions)
-        #print(all_coverage_rates)
 
-        print("----------------------------------------------")
-        print("----------------------------------------------")
-         
-        
-        all_distances=[]
-        pourcentage=0.3
-        cutt=round(pourcentage*len(all_sensor_positions))
-        all_new=[]
-        all_suivi=[]
-        all_ri=[]
-        all_old=[]
-        new_coverages=[]
-        
-# porsuite et les nouveaux couvertures
-        for i in range(cutt, len(all_sensor_positions)):
-                   distancee=[]
-                   random_nbr=random.randint(0,cutt-1)
-                   ri=random.uniform(0.9,1)
-                   
-                   for j in range(num_sensors):
-                       old =all_sensor_positions[i]
-                       suivi=all_sensor_positions[random_nbr]
-                       distance = calculate_absolute_distance(old[j],suivi[j] )
-                       distancee.append(distance)
-                       
-                       
-                   all_ri.append(ri)
-                   all_suivi.append(all_suivi)
-                   all_old.append(old)
-                   new_sensors=porsuite_equation(old,flight_ri(distancee,ri),suivi) 
-                   cvrgs=probability_multiplesensors_multipoints(M, N,new_sensors , sensing_range)  
-                   new_coverages.append(cvrgs)
-                   all_distances.append(distancee)
-                   
-                   all_new.append(new_sensors)
-        
-                   
-                   
-                  
-        all_coverages = new_coverages +all_coverage_rates
-        all_positions= all_new + all_sensor_positions
-        bubble_sort_descending(all_coverages, all_positions)
-        print("________________________________________________________") 
-        #print("all coverage")    
-        #print(all_coverages)
-        print("________________________________________________________")  
-        #print("all positions")    
-        #print(all_positions)
-        print("________________________________________________________")  
-        print("best 10 solutions")   
-        the_best_10_solution1=[]
-        the_best_10_couverages1=[]
-         
-        for i in range (10):
-               the_best_10_solution1.append(all_positions[i])
-               the_best_10_couverages1.append(all_coverages[i])
-        print(the_best_10_couverages1)
-        print(the_best_10_solution1)  
-        
-        
-        nbr_voisin=15#10
+        print("*********************************    First 10 coverages ****************************")
+        print(all_coverage_rates)
+
+              
+        nbr_voisin=10#10
         iterations=30
         #20
         the10Voisins=[]
@@ -264,9 +267,9 @@ class MyMainWindow(QMainWindow):
         tabu_list=[]
         tabu_list_max_size=10
         
-        for i in range(len(the_best_10_solution1)):#10
-            bestsol=the_best_10_solution1[i]
-            bestCov=the_best_10_couverages1[i]
+        for i in range(len(all_sensor_positions)):#10
+            bestsol=all_sensor_positions[i]
+            bestCov=all_coverage_rates[i]
             #the liste li fiha the best coverages in every iteration(20)
             best_sol_every_iteration=[]
             best_cov_every_iteration=[]
@@ -276,21 +279,31 @@ class MyMainWindow(QMainWindow):
               
                 the10Voisins=[]
                 the10Covvoisin=[]
-                randomxx=[]
-                randomyy=[]
+                
                 
             
                 for x in range(nbr_voisin):#10
-                    randomX=sensing_range*(random.uniform(-0.5,0.5))
-                    randomY=sensing_range*(random.uniform(-0.5,0.5))
+                    
                     voisin=[]
                     
                     for j in range(len(bestsol)):#70
                          randomX=sensing_range*(random.uniform(-0.5,0.5))
                          randomY=sensing_range*(random.uniform(-0.5,0.5))
-                         voisin.append((bestsol[j][0]+randomX,bestsol[j][1]+randomY))
-                    #randomxx.append(randomX)  
-                    #randomyy.append(randomY)  
+                         X=bestsol[j][0]+randomX
+                         Y=bestsol[j][1]+randomY
+                         if   X  > M - sensing_range  :
+                              X = M - sensing_range
+                         if Y > N - sensing_range  :
+                             Y = N- sensing_range
+                         if X <  M0+sensing_range:
+                             X =  M0+sensing_range
+                         if Y <  N0+sensing_range:
+                             Y =  N0+sensing_range
+
+                         voisin.append((X,Y))
+                    
+                
+                    
                     the10Voisins.append(voisin)
                     CovVoisin=probability_multiplesensors_multipoints(M, N,voisin , sensing_range) 
                     the10Covvoisin.append(CovVoisin)
@@ -301,8 +314,7 @@ class MyMainWindow(QMainWindow):
                 bubble_sort_descending(the10Covvoisin, the10Voisins)
                 bestsol=the10Voisins[0]
                 bestCov=the10Covvoisin[0]
-                #print("voisins ",the10Voisins)
-                #print("cov ",the10Covvoisin)
+                
 
                 bestsolution=select_solution_not_in_tabuu(bestsol,tabu_list)
 
@@ -324,83 +336,230 @@ class MyMainWindow(QMainWindow):
                     if len(tabu_list) > tabu_list_max_size:
                          tabu_list.pop(0)
 
-
-
-
-                #best_sol_every_iteration.append(bestsol)
-                #best_cov_every_iteration.append(bestCov)
-                #print("************************************")
-                #print("i ",i)
-                #print("w ",w)
-                #print("randomx ",randomxx)
-                #print("randomy ",randomyy)
-                
-                # Select the best solution not in the Tabu list
-                
-            #print('tabu_list')
-            #print(tabu_list)
-
-
             bubble_sort_descending(best_cov_every_iteration, best_sol_every_iteration)  
             bes_sol_after_20iter.append(best_sol_every_iteration[0])
             best_cov_after20iter.append(best_cov_every_iteration[0])
-        print("*********************")
-        print("bes_sol_after_20iter",bes_sol_after_20iter)
-        print("best_cov_after20iter",best_cov_after20iter)
-        bubble_sort_descending(best_cov_after20iter,bes_sol_after_20iter)
+        print("*********************************    Matrice M after Tabou list *********************************")
+        #bubble_sort_descending(all_coverage_rates, all_sensor_positions)
 
         
-
-
-
-
-        #print("the seven vectors of distance") 
-        #print(all_distances)    
-        print("_______________________________________________________")  
-        #print("capteurs suivis ",suivi)
-        print("_________________________________________________________")  
-        #print("old",all_old)
-        print("_______________________________________________________")  
-        #print(" ri",all_ri)
-        print("____________________________________________________________")  
-        #print("new sensor")    
-        #print(all_new)
-        print("____________________________________________________________")  
-        #print("new coverages")    
-        #print(new_coverages)
-
+       # print("bes_sol_after_20iter (matrice M)",bes_sol_after_20iter)
         
-
-        #sorted_coverage_rates = sorted(all_coverage_rates)
-        #print(sorted_coverage_rates)
-        #print("Sorted Coverage Rates:",sorted(all_coverage_rates, reverse=True))
-        # Get the three maximum coverage rates
-        #max_three_coverage_rates = sorted_coverage_rates[-3:]
-
-           # Get the last seven minimum coverage rates
-        #min_seven_coverage_rates = sorted_coverage_rates[:7]
-
-        print("----------------------------------------------")
-        print("----------------------------------------------")
+        print("best_cov_after20iter (de M)",best_cov_after20iter)
         
+        
+      
 
-        #print("Three Maximum Coverage Rates:", max_three_coverage_rates)
+
+
+        #***********************************************************************************************************************
+        #***********************************************************************************************************************
+        #porsuite
+        #***********************************************************************************************************************
+        #***********************************************************************************************************************
+    
+    # porsuite et les nouveaux couvertures
+        print("*********************************************************************************************") 
+        print("****************************** Sensors after porsuite*****************************************")  
+        print("*********************************************************************************************") 
+        
+        iteration=200
+        for u in range(iteration):
+            all_distances=[]
+            pourcentage=0.3
+            cutt=round(pourcentage*len(all_sensor_positions))
+            all_new=[]
+            all_suivi=[]
+            all_ri=[]
+            all_old=[]
+            new_coverages=[]
+            APi=random.uniform(-0.003,0.003)
+
+            for i in range(cutt, len(all_sensor_positions)):
+                   flight=[]
+                   distanceM_X=[]
+                   random_nbr=random.randint(0,cutt-1)
+                   ri=random.uniform(-0.003,0.003)
+                   old =all_sensor_positions[i]
+                   suivi=all_sensor_positions[random_nbr]
+                   matriceM=bes_sol_after_20iter[i]
+                   riX=random.uniform(-0.5,0.5)
+                   riY=random.uniform(-0.5,0.5)
+                   
+                   for j in range(num_sensors):
+                       new_sensors2=[]
+                       
+                       distance = calculate_absolute_distance(old[j],suivi[j] )
+                       distancee=calculate_absolute_distance(old[j],matriceM[j])
+
+                       distanceM_X.append(distancee)
+                       flight.append(distance)
+                       
+                       
+                   all_ri.append(ri)
+                   all_suivi.append(all_suivi)
+                   all_old.append(old)
+                   #new_sensors=porsuite_equation(old,flight_ri(flight,ri),suivi) 
+                   if APi <= ri:
+                       new_sensors=porsuite_equation(old,matrix_multiply(flight_ri(flight,ri), distanceM_X),suivi) 
+                   else :
+                       new_sensors=porsuite_equation_random(old,riX,riY,sensing_range) 
+                   for k in range(len(new_sensors)):#70
+                         X=new_sensors[k][0]
+                         Y=new_sensors[k][1]
+                         if   X  > M - sensing_range  :
+                              X = M - sensing_range
+                         if Y > N - sensing_range  :
+                             Y = N- sensing_range
+                         if X <  M0+sensing_range:
+                             X =  M0+sensing_range
+                         if Y <  N0+sensing_range:
+                             Y =  N0+ sensing_range
+
+                         new_sensors2.append((X,Y))   
+                   new_sensors=new_sensors2      
+                   cvrgs=probability_multiplesensors_multipoints(M, N,new_sensors , sensing_range)  
+                   new_coverages.append(cvrgs)
+                   all_distances.append(flight)
+                   
+                   all_new.append(new_sensors)
+                   #bubble_sort_descending(new_coverages, all_new)
+            #print("**********************************************")         
+            #print("new_coverages") 
+            #print(new_coverages)
+            new__cov=[]
+            new__sol=[]
+            new__cov_M=[]
+            new__sol_M=[]
+            
+            #new_m_cov=comparison(best_cov_after20iter, new_coverages , bes_sol_after_20iter,all_new)
+            new__cov,new__sol=comparison(all_coverage_rates, new_coverages , all_sensor_positions,all_new,cutt)
+            new__cov_M,new__sol_M=comparison(best_cov_after20iter, new_coverages , bes_sol_after_20iter,all_new,cutt)
+            best_cov_after20iter=new__cov_M          
+            bes_sol_after_20iter=new__sol_M
+            all_coverage_rates=new__cov        
+            all_sensor_positions=new__sol
+            bubble_sort_descending_four(all_coverage_rates,all_sensor_positions,best_cov_after20iter,bes_sol_after_20iter)
+            
+            
+            max_value = max(best_cov_after20iter)
+            max_valuee = max(all_coverage_rates)
+            
+            #print(" max de M:",max_value)
+            #print(" les couverures after comparison :",all_coverage_rates)
+            #print("*****************************************",u)
+        print(" les couverures after porsuite :",all_coverage_rates)    
+        
+        print("after porsuite (de M)",best_cov_after20iter)
+        
+                   
        
-        #print("Last Seven Minimum Coverage Rates:", min_seven_coverage_rates)
+        #***********************************************************************************************************************
+        #***********************************************************************************************************************
+        #porsuite
+        #***********************************************************************************************************************
+        #***********************************************************************************************************************
+        print("*********************************************************************************************") 
+        print("****************************** Sensors after EVASION *****************************************")  
+        print("*********************************************************************************************")
+        itr_evasion=500
+        evasion_cov_after_all_itr=[]
+        evasion_sol_after_all_itr=[]
+
+        for j in range (itr_evasion):
+            all_10voisins_evasion=[]
+            all_10cov_evasion=[]
+                
+            for i in range(len(all_sensor_positions)):#10 sol
+                    voisin_Evasion=[]
+                    every_sensor=all_sensor_positions[i]
+                    random_sensing_range=random.randint(1,sensing_range)
+                     
+                    for j in range(len(every_sensor)):#70 points
+            
+                         ##### hna
+                         random_X_evasion=random_sensing_range*(random.uniform(-7.5,7.5)) 
+                         random_Y_evasion=random_sensing_range*(random.uniform(-7.5,7.5))
+                         X=every_sensor[j][0]+random_X_evasion
+                         Y=every_sensor[j][1]+random_Y_evasion
+                         if   X  > M - sensing_range  :
+                              X = M - sensing_range
+                         if Y > N - sensing_range  :
+                             Y = N- sensing_range
+                         if X <  M0+sensing_range:
+                             X =  M0+sensing_range
+                         if Y <  N0+sensing_range:
+                             Y =  N0+sensing_range
+
+                         voisin_Evasion.append((X,Y))#1
+                    cov_evasion=probability_multiplesensors_multipoints(M, N,voisin_Evasion, sensing_range)
+                    all_10cov_evasion.append(cov_evasion) 
+                    all_10voisins_evasion.append(voisin_Evasion) 
+            #print(all_10cov_evasion) #10  
+            evasion_cov_after_all_itr.append(all_10cov_evasion)
+            evasion_sol_after_all_itr.append(all_10voisins_evasion)
+                    
+        cov=all_coverage_rates
+        sol=all_sensor_positions
+        best_cov1=evasion_cov_after_all_itr
+        best_sol1=evasion_sol_after_all_itr
+        Mcov=best_cov_after20iter
+        Msol=bes_sol_after_20iter
+
+        for j in range(len(all_sensor_positions)):
+            best_cov2=[]
+            best_sol2=[]
+            for i in range(len(best_cov1)):
+                best_cov2.append(best_cov1[i][j])
+                best_sol2.append(best_sol1[i][j])
+    
+            paired_values = zip(best_cov2, best_sol2)
+            max_value = max(paired_values)
+            max_value_cov, max_value_sol = max_value
+    
+            if max_value_cov>cov[j]:
+               cov[j]=max_value_cov
+               sol[j]=max_value_sol  
+
+            if max_value_cov>Mcov[j]:
+              Mcov[j]=max_value_cov
+              Msol[j]=max_value_sol    
+    
+        print("*******************sol,cov after mis a jour de evasion***************")
+        #print(sol)
+        print(cov)  
+        print("***************sol M,cov M after evasion ******************************")
+        #print(Msol)
+        bubble_sort_descending(Mcov,Msol)
+        print(Mcov) 
+            
+              
+
+
+
+
+
+
+
+
+
+
         
-        #print("Sorted Coverage Rates:",sorted(all_coverage_rates, reverse=True))
-        print("----------------------------------------------")
-        print("----------------------------------------------")
-        #print("Best Sensor positions:",best_sensor_positions )
-        #print("The best Coverage:",probability_multiplesensors_multipoints(M, N,best_sensor_positions, sensing_range) )
-        print("Best Sensor positions:",bes_sol_after_20iter[0])
-        print("The best Coverage:",probability_multiplesensors_multipoints(M, N,bes_sol_after_20iter[0], sensing_range) )
+
+        
+        #print("Best Sensor positions:",bes_sol_after_20iter[0])
+        #print("The best Coverage:",probability_multiplesensors_multipoints(M, N,bes_sol_after_20iter[0], sensing_range) )
          
         
-        #for x, y in new_sensors:
-        #for x, y in the_best_10_solution1[0]:
-        for x, y in  bes_sol_after_20iter [0]: 
-        #for x, y in best_sensor_positions:       
+
+        
+
+        
+        
+
+       
+        for x, y in  Msol[0]: 
+             
             # Add sensors
                ax.scatter(x, y, s=sensor_size, c=sensor_color, alpha=0.8, edgecolors='black')
 
@@ -416,4 +575,3 @@ if __name__ == "__main__":
     window = MyMainWindow()
     window.show()
     sys.exit(app.exec())
-
